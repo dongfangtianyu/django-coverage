@@ -22,9 +22,6 @@ from django.conf import settings
 COVERAGE_TEST_RUNNER = getattr(settings, 'COVERAGE_TEST_RUNNER',
                              'django_coverage.coverage_runner.CoverageRunner')
 
-# Specify whether coverage data file is created or not.
-COVERAGE_USE_CACHE = getattr(settings, 'COVERAGE_USE_CACHE', False)
-
 # Specify regular expressions of code blocks the coverage analyzer should
 # ignore as statements (e.g. ``raise NotImplemented``).
 # These statements are not figured in as part of the coverage statistics.
@@ -90,3 +87,9 @@ COVERAGE_USE_STDOUT = getattr(settings, 'COVERAGE_USE_STDOUT', COVERAGE_REPORT_H
 # The name of the folder within utils/coverage_report/badges/ that
 # contains the badges we want to use.
 COVERAGE_BADGE_TYPE = getattr(settings, 'COVERAGE_BADGE_TYPE', 'drone.io')
+
+
+# If COVERAGE_MINI_RAISE_EXCEPTION is True, and code coverage less than COVERAGE_MINI_COVER,
+# The program throws an exception for capturing by CI
+COVERAGE_MINI_COVER = getattr(settings, 'COVERAGE_MINI_COVER', 0)
+COVERAGE_MINI_RAISE_EXCEPTION = getattr(settings, 'COVERAGE_MINI_RAISE_EXCEPTION', False)

@@ -41,10 +41,14 @@ from django_coverage.utils.module_tools import get_all_modules
 DjangoTestSuiteRunner = get_runner(global_settings)
 cov = coverage.Coverage()
 
+
 class CoverageRunner(DjangoTestSuiteRunner):
     """
     Test runner which displays a code coverage report at the end of the run.
     """
+
+    raise_exception = getattr(settings, 'COVERAGE_MINI_RAISE_EXCEPTION', None)
+    mini_cover = getattr(settings, 'COVERAGE_MINI_COVER', 0)
 
     def __new__(cls, *args, **kwargs):
         """
@@ -68,7 +72,8 @@ class CoverageRunner(DjangoTestSuiteRunner):
         return '.'.join(app_model_module.__name__.split('.')[:-1])
 
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
-        cov.use_cache(settings.COVERAGE_USE_CACHE)
+        pc_covered = 0
+
         for e in settings.COVERAGE_CODE_EXCLUDES:
             cov.exclude(e)
         cov.start()
@@ -76,48 +81,17 @@ class CoverageRunner(DjangoTestSuiteRunner):
                                                         extra_tests, **kwargs)
         cov.stop()
 
-        cov_modules = []
-        if test_labels:
-            for label in test_labels:
-                label = label.split('.')[0]
-                app = get_app(label)
-                cov_modules.append(self._get_app_package(app))
-        else:
-            for app in get_apps():
-                cov_modules.append(self._get_app_package(app))
-
-        cov_modules.extend(settings.COVERAGE_ADDITIONAL_MODULES)
-
-        packages, modules, excludes, errors = get_all_modules(
-            cov_modules, settings.COVERAGE_MODULE_EXCLUDES,
-            settings.COVERAGE_PATH_EXCLUDES)
-
         if settings.COVERAGE_USE_STDOUT:
-            cov.report(list(modules.values()), show_missing=1)
-            if excludes:
-                message = "The following packages or modules were excluded:"
-                print("")
-                print(message)
-                for e in excludes:
-                    print(e)
-                print("")
-            if errors:
-                message = "There were problems with the following packages "
-                message += "or modules:"
-                print("")
-                print(message)
-                for e in errors:
-                    print(e)
-                print("")
+            pc_covered = cov.report(show_missing=1)
 
         outdir = settings.COVERAGE_REPORT_HTML_OUTPUT_DIR
         if outdir:
             outdir = os.path.abspath(outdir)
-            if settings.COVERAGE_CUSTOM_REPORTS:
-                html_report(outdir, modules, excludes, errors)
-            else:
-                cov.html_report(list(modules.values()), outdir)
-            print("")
+            pc_covered = cov.html_report(directory=outdir)
             print("HTML reports were output to '%s'" %outdir)
+
+        if self.raise_exception and pc_covered < self.mini_cover:
+            print ("covered must >= {}".format(self.mini_cover))
+            sys.exit(1)
 
         return results
