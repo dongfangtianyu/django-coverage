@@ -1,1 +1,5 @@
 *.pyc
+*.bak
+.idea/*
+build/*
+django_coverage.egg-info/*
