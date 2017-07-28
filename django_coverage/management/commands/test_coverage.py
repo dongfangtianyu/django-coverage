@@ -37,7 +37,7 @@ class Command(test.Command):
         runner can inherit from it.  Then, call the test command. This
         plays well with apps that override the test command, such as South.
         """
-        coverage_source = options.pop("source", getattr(settings, 'BASE_DIR', None))
+        coverage_source = options.pop("source", None) or  getattr(settings, 'BASE_DIR', None)
         if coverage_source and not hasattr(coverage_source, '__iter__'):
             coverage_source = [coverage_source, ]
         coverage_settings.COVERAGE_SOURCE = coverage_source
