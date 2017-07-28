@@ -26,7 +26,7 @@ setup(
                 'django_coverage.utils.coverage_report.templates'],
       package_data={'django_coverage': ['utils/coverage_report/badges/*/*.png']},
 
-      requires = ['django (>=1.2)', 'coverage (>= 2.85)'],
+      requires = ['django (>=1.8)', 'coverage (>= 4.4.1)'],
 
       classifiers=[
           'Development Status :: 4 - Beta',

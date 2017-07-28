@@ -1,3 +1,5 @@
+# coding=utf-8
+from __future__ import unicode_literals
 """
 Copyright 2009 55 Minutes (http://www.55minutes.com)
 
