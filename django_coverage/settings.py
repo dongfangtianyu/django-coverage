@@ -95,3 +95,6 @@ COVERAGE_BADGE_TYPE = getattr(settings, 'COVERAGE_BADGE_TYPE', 'drone.io')
 # The program throws an exception for capturing by CI
 COVERAGE_MINI_COVER = getattr(settings, 'COVERAGE_MINI_COVER', 0)
 COVERAGE_MINI_RAISE_EXCEPTION = getattr(settings, 'COVERAGE_MINI_RAISE_EXCEPTION', False)
+
+
+COVERAGE_SOURCE = getattr(settings, 'COVERAGE_SOURCE', False)

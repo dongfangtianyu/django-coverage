@@ -21,28 +21,27 @@ import os
 import sys
 
 import django
-
-if django.VERSION < (1, 2):
+import coverage
+if django.VERSION < (1, 8):
     msg = """
 
-    django-coverage 1.1+ requires django 1.2+.
+    django-coverage 1.3+ requires django 1.8+.
     Please use django-coverage 1.0.3 if you have django 1.1 or django 1.0
     """
     raise Exception(msg)
 
+
 from django.conf import global_settings
 from django.db.models import get_app, get_apps
 from django.test.utils import get_runner
-
-import coverage
-
 from django_coverage import settings
 from django_coverage.utils.coverage_report import html_report
 from django_coverage.utils.module_tools import get_all_modules
 
 
+COVERAGE_SOURCE = getattr(settings, 'COVERAGE_SOURCE', None)
+cov = coverage.Coverage(source=COVERAGE_SOURCE)
 DjangoTestSuiteRunner = get_runner(global_settings)
-cov = coverage.Coverage()
 
 
 class CoverageRunner(DjangoTestSuiteRunner):
@@ -93,6 +92,7 @@ class CoverageRunner(DjangoTestSuiteRunner):
             pc_covered = cov.html_report(directory=outdir)
             print("HTML reports were output to '%s'" %outdir)
 
+        print ("COVERAGE_SOURCE is {}".format(COVERAGE_SOURCE))
         if self.raise_exception and pc_covered < self.mini_cover:
             print ("covered must >= {}".format(self.mini_cover))
             sys.exit(1)
