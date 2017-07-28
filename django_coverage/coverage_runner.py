@@ -39,8 +39,7 @@ from django_coverage.utils.coverage_report import html_report
 from django_coverage.utils.module_tools import get_all_modules
 
 
-COVERAGE_SOURCE = getattr(settings, 'COVERAGE_SOURCE', None)
-cov = coverage.Coverage(source=COVERAGE_SOURCE)
+
 DjangoTestSuiteRunner = get_runner(global_settings)
 
 
@@ -51,6 +50,7 @@ class CoverageRunner(DjangoTestSuiteRunner):
 
     raise_exception = getattr(settings, 'COVERAGE_MINI_RAISE_EXCEPTION', None)
     mini_cover = getattr(settings, 'COVERAGE_MINI_COVER', 0)
+    coverage_source = getattr(settings, 'COVERAGE_SOURCE', None)
 
     def __new__(cls, *args, **kwargs):
         """
@@ -75,24 +75,24 @@ class CoverageRunner(DjangoTestSuiteRunner):
 
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
         pc_covered = 0
-
+        self.cov = coverage.Coverage(source=self.coverage_source)
         for e in settings.COVERAGE_CODE_EXCLUDES:
-            cov.exclude(e)
-        cov.start()
+            self.cov.exclude(e)
+        self.cov.start()
         results = super(CoverageRunner, self).run_tests(test_labels,
                                                         extra_tests, **kwargs)
-        cov.stop()
+        self.cov.stop()
 
         if settings.COVERAGE_USE_STDOUT:
-            pc_covered = cov.report(show_missing=1)
+            pc_covered = self.cov.report(show_missing=1)
 
         outdir = settings.COVERAGE_REPORT_HTML_OUTPUT_DIR
         if outdir:
             outdir = os.path.abspath(outdir)
-            pc_covered = cov.html_report(directory=outdir)
+            pc_covered = self.cov.html_report(directory=outdir)
             print("HTML reports were output to '%s'" %outdir)
 
-        print ("COVERAGE_SOURCE is {}".format(COVERAGE_SOURCE))
+        print ("coverage_source is {}".format(self.coverage_source))
         if self.raise_exception and pc_covered < self.mini_cover:
             print ("covered must >= {}".format(self.mini_cover))
             sys.exit(1)

@@ -25,6 +25,11 @@ class Command(test.Command):
             "entire site if no apps are specified. Then generates coverage "
             "report both onscreen and as HTML.")
 
+    def add_arguments(self, parser):
+        parser.add_argument('--source', metavar='coverage_source', nargs=None,
+                            help='The value is a comma- or newline-separated list of directories or package names. If specified, only source inside these directories or packages will be measured')
+        super(Command, self).add_arguments(parser)
+
     def handle(self, *test_labels, **options):
         """
         Replaces the original test runner with the coverage test runner, but
@@ -32,6 +37,10 @@ class Command(test.Command):
         runner can inherit from it.  Then, call the test command. This
         plays well with apps that override the test command, such as South.
         """
+        coverage_source = options.pop("source", getattr(settings, 'BASE_DIR', None))
+        if coverage_source and not hasattr(coverage_source, '__iter__'):
+            coverage_source = [coverage_source, ]
+        coverage_settings.COVERAGE_SOURCE = coverage_source
         coverage_settings.ORIG_TEST_RUNNER = settings.TEST_RUNNER
         settings.TEST_RUNNER = coverage_settings.COVERAGE_TEST_RUNNER
         call_command('test', *test_labels, **options)
