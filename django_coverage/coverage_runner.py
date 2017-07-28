@@ -39,7 +39,7 @@ from django_coverage.utils.module_tools import get_all_modules
 
 
 DjangoTestSuiteRunner = get_runner(global_settings)
-
+cov = coverage.Coverage()
 
 class CoverageRunner(DjangoTestSuiteRunner):
     """
@@ -68,32 +68,32 @@ class CoverageRunner(DjangoTestSuiteRunner):
         return '.'.join(app_model_module.__name__.split('.')[:-1])
 
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
-        coverage.use_cache(settings.COVERAGE_USE_CACHE)
+        cov.use_cache(settings.COVERAGE_USE_CACHE)
         for e in settings.COVERAGE_CODE_EXCLUDES:
-            coverage.exclude(e)
-        coverage.start()
+            cov.exclude(e)
+        cov.start()
         results = super(CoverageRunner, self).run_tests(test_labels,
                                                         extra_tests, **kwargs)
-        coverage.stop()
+        cov.stop()
 
-        coverage_modules = []
+        cov_modules = []
         if test_labels:
             for label in test_labels:
                 label = label.split('.')[0]
                 app = get_app(label)
-                coverage_modules.append(self._get_app_package(app))
+                cov_modules.append(self._get_app_package(app))
         else:
             for app in get_apps():
-                coverage_modules.append(self._get_app_package(app))
+                cov_modules.append(self._get_app_package(app))
 
-        coverage_modules.extend(settings.COVERAGE_ADDITIONAL_MODULES)
+        cov_modules.extend(settings.COVERAGE_ADDITIONAL_MODULES)
 
         packages, modules, excludes, errors = get_all_modules(
-            coverage_modules, settings.COVERAGE_MODULE_EXCLUDES,
+            cov_modules, settings.COVERAGE_MODULE_EXCLUDES,
             settings.COVERAGE_PATH_EXCLUDES)
 
         if settings.COVERAGE_USE_STDOUT:
-            coverage.report(list(modules.values()), show_missing=1)
+            cov.report(list(modules.values()), show_missing=1)
             if excludes:
                 message = "The following packages or modules were excluded:"
                 print("")
@@ -116,7 +116,7 @@ class CoverageRunner(DjangoTestSuiteRunner):
             if settings.COVERAGE_CUSTOM_REPORTS:
                 html_report(outdir, modules, excludes, errors)
             else:
-                coverage._the_coverage.html_report(list(modules.values()), outdir)
+                cov.html_report(list(modules.values()), outdir)
             print("")
             print("HTML reports were output to '%s'" %outdir)
 
