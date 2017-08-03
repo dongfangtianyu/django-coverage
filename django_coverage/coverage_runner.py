@@ -92,7 +92,7 @@ class CoverageRunner(DjangoTestSuiteRunner):
             pc_covered = self.cov.html_report(directory=outdir)
             print("HTML reports were output to '%s'" %outdir)
 
-        print ("coverage_source is {}".format(self.coverage_source))
+        # print ("coverage_source is {}".format(self.coverage_source))
         if self.raise_exception and pc_covered < self.mini_cover:
             print ("covered must >= {}".format(self.mini_cover))
             sys.exit(1)
