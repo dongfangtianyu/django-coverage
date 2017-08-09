@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from distutils.core import setup
+from setuptools import find_packages, setup
 from django_coverage import __version__
 
 setup(
@@ -27,6 +27,10 @@ setup(
       package_data={'django_coverage': ['utils/coverage_report/badges/*/*.png']},
 
       requires = ['django (>=1.8)', 'coverage (>= 4.4.1)'],
+      install_requires=[
+                'Django>=1.8<=1.11',
+                'coverage>=4.4.1',
+      ],
 
       classifiers=[
           'Development Status :: 4 - Beta',

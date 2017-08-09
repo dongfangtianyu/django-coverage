@@ -32,12 +32,9 @@ if django.VERSION < (1, 8):
 
 
 from django.conf import global_settings
-from django.db.models import get_app, get_apps
 from django.test.utils import get_runner
 from django_coverage import settings
 from django_coverage.utils.coverage_report import html_report
-from django_coverage.utils.module_tools import get_all_modules
-
 
 
 DjangoTestSuiteRunner = get_runner(global_settings)
